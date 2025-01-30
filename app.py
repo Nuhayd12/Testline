@@ -65,7 +65,12 @@ def logout():
     return redirect(url_for('login'))
 
 if __name__ == '__main__':
-    with app.app_context():
+    with app.app_context(): 
         db.create_all()  
     app.run(debug=True)
+    
+# Operational Error: qlalchemy.exc.OperationalError: (sqlite3.OperationalError) table user has no column named username
+# [SQL: INSERT INTO user (username, phone, email, password) VALUES (?, ?, ?, ?)] [parameters: ('Nuhayd Shaik', '8904445302', 'sdasdn@gmail.com', 'pbkdf2:sha256:600000$IQ3XquqTcQsF17yY$0274ce17596bbb17f98d68a1d642a20aca9fc5925081d3674eedb5ded9f1ad06')]
+# (Background on this error at: https://sqlalche.me/e/20/e3q8)
+# Traceback (most recent call last)
 

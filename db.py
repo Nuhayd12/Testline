@@ -14,6 +14,8 @@ CREATE TABLE IF NOT EXISTS user (
 )
 """)
 
+
+
 conn.commit()
 conn.close()
 print("Database updated successfully!")
