@@ -13,13 +13,25 @@ CREATE TABLE IF NOT EXISTS user (
     password TEXT NOT NULL
 )
 """)
-
-cursor.execute("""
-INSERT INTO user(username, phone, email, password) VALUES (username,phone,email,password)  
-""")
-
-
-
 conn.commit()
-conn.close()
-print("Database updated successfully!")
+
+# print("Database created successfully!")
+# conn = sqlite3.connect('users.db')
+# cursor = conn.cursor()
+
+
+# cursor.execute("""
+#               SELECT * FROM user """)
+# conn.commit()
+
+# columns = cursor.fetchall()
+
+# for column in columns:
+#     print(column)
+
+# cursor.execute("PRAGMA table_info(user)")
+# columns = cursor.fetchall()
+# for column in columns:
+#     print(column)
+
+# conn.close()

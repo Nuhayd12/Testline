@@ -15,8 +15,8 @@ class User(db.Model):
     phone = db.Column(db.String(20), unique=True, nullable=False)  # Added phone
     email = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(150), nullable=False)
-
-
+    
+    
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
