@@ -14,6 +14,10 @@ CREATE TABLE IF NOT EXISTS user (
 )
 """)
 
+cursor.execute("""
+INSERT INTO user(username, phone, email, password) VALUES (username,phone,email,password)  
+""")
+
 
 
 conn.commit()
