@@ -9,10 +9,16 @@
 <body>
     <div class="container">
         <h2>Login</h2>
-        <form action="{{ url_for('login') }}" method="POST">
-            <input type="email" name="email" placeholder="Enter your email" required>
-            <input type="password" name="password" placeholder="Enter your password" required>
-            <button type="submit">Login</button>
+        <form method="POST" action="{{ url_for('login') }}">
+            {{ form.hidden_tag() }}  <!-- CSRF protection -->
+            
+            <label for="email">Email:</label>
+            {{ form.email() }}  <!-- Render email field -->
+
+            <label for="password">Password:</label>
+            {{ form.password() }}  <!-- Render password field -->
+
+            {{ form.submit() }}  <!-- Render submit button -->
         </form>
         <p>Don't have an account? <a href="{{ url_for('signup') }}">Sign up here</a></p>
     </div>
