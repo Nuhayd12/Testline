@@ -3,15 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test</title>
+    <title>Biology Minor Test</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <script>
-        let timeLeft = 2700; // 45 minutes in seconds
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
+    <script>
+        
+        let timeLeft = 1800; // 45 minutes in seconds
+        let currentQuestion = 0;
+        let questions = [];
+        let userAnswers = {}; // Store selected answers
+
+        // Update the countdown timer
         function updateTimer() {
             let minutes = Math.floor(timeLeft / 60);
             let seconds = timeLeft % 60;
-            document.getElementById("timer").innerText = `${minutes}:${seconds}`;
+            document.getElementById("timer").innerText = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
             if (timeLeft > 0) {
                 timeLeft--;
                 setTimeout(updateTimer, 1000);
@@ -20,29 +27,151 @@
             }
         }
 
+        // Fetch quiz questions from backend
+        async function fetchQuestions() {
+            try {
+                const response = await fetch('/get_quiz_questions');
+                questions = await response.json();
+                renderQuestion();
+            } catch (error) {
+                console.error("Error fetching questions:", error);
+            }
+        }
+
+        // Render a single question based on `currentQuestion`
+        function renderQuestion() {
+            if (questions.length === 0) return;
+
+            const questionContainer = document.getElementById("question-container");
+            questionContainer.innerHTML = ""; // Clear previous content
+
+            let questionData = questions[currentQuestion];
+            let questionElement = document.createElement("div");
+            questionElement.classList.add("question-box");
+
+            questionElement.innerHTML = `
+                <h2 class="question-title">Question ${currentQuestion + 1}</h2>
+                <p class="question-text">${questionData.question}</p>
+                <div class="options">
+                    ${questionData.options.map((opt, index) => `
+                        <label class="option-label">
+                            <input type="radio" name="q${questionData.id}" value="${opt}" 
+                                ${userAnswers[`q${questionData.id}`] === opt ? "checked" : ""} 
+                                onchange="saveAnswer('q${questionData.id}', '${opt}')">
+                            <span class="custom-radio"></span>
+                            ${opt}
+                        </label>
+                    `).join('')}
+                </div>
+            `;
+
+            questionContainer.appendChild(questionElement);
+
+            // Hide "Previous" button for the first question
+            document.getElementById("prev-btn").style.display = currentQuestion === 0 ? "none" : "inline-block";
+
+            // Show "Submit" button only on last question
+            document.getElementById("submit-btn").style.display = currentQuestion === questions.length - 1 ? "inline-block" : "none";
+
+            // Hide "Next" button on last question
+            document.getElementById("next-btn").style.display = currentQuestion === questions.length - 1 ? "none" : "inline-block";
+        }
+
+        // Save user's selected answer
+        function saveAnswer(questionId, answer) {
+            userAnswers[questionId] = answer;
+        }
+
+        // Navigate to the next question
+        function nextQuestion() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                renderQuestion();
+            }
+        }
+
+        // Navigate to the previous question
+        function prevQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                renderQuestion();
+            }
+        }
+        function submitQuiz() {
+            fetch('/submit_quiz', {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(userAnswers)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert("Quiz submitted successfully!");
+        
+                if (data.message === "confetti") {
+                    // Show confetti animation
+                    showConfetti();
+                } else if (data.message === "well_done") {
+                    alert("Well done! Keep improving.");
+                } else {
+                    alert("Check your answers carefully.");
+                }
+        
+                window.location.href = "/submit"; 
+            })
+            .catch(error => console.error("Error submitting quiz:", error));
+        }
+        
+
+        // Initialize the page on load
         window.onload = function() {
             updateTimer();
+            fetchQuestions();
         }
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <script>
+    function showConfetti() {
+        confetti({
+            particleCount: 150,
+            spread: 70,
+            origin: { y: 0.6 }
+        });
+    }
+
+    // Check score message
+    document.addEventListener("DOMContentLoaded", function () {
+        const scoreMessage = "{{ message }}";
+
+        if (scoreMessage === "confetti") {
+            showConfetti();
+        } else if (scoreMessage === "well_done") {
+            alert("Well done! Keep it up!");
+        } else {
+            alert("Check your answers carefully.");
+        }
+    });
+    </script>
+
 </head>
 <body>
     <div class="dashboard-container">
         <div class="dashboard-card">
             <h1>Biology Minor Test</h1>
             <p>Time Remaining: <span id="timer">45:00</span></p>
-            <form id="test-form" action="/submit-test" method="POST">
-                <p>Q1: What is the function of hemoglobin?</p>
-                <input type="radio" name="q1" value="a"> Oxygen transport<br>
-                <input type="radio" name="q1" value="b"> Digestion<br>
-                <input type="radio" name="q1" value="c"> Excretion<br>
-                
-                <p>Q2: What is the normal pH level of blood?</p>
-                <input type="radio" name="q2" value="a"> 6.5<br>
-                <input type="radio" name="q2" value="b"> 7.4<br>
-                <input type="radio" name="q2" value="c"> 8.0<br>
 
-                <button type="submit" class="btn">Submit Test</button>
+            <form id="test-form">
+                <div id="question-container">
+                    <!-- Questions will be loaded here dynamically -->
+                </div>
             </form>
+
+            <div class="quiz-navigation">
+                <button id="prev-btn" onclick="prevQuestion()">⬅ Previous</button>
+                <button id="next-btn" onclick="nextQuestion()">Next ➡</button>
+                <button id="submit-btn" onclick="submitQuiz()" style="display: none;">Submit Quiz</button>
+            </div>
         </div>
     </div>
 </body>

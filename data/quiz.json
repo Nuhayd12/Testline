@@ -1,0 +1,146 @@
+{
+    "questions": [
+        {
+            "id": 1,
+            "question": "What is the powerhouse of the cell?",
+            "options": ["Nucleus", "Mitochondria", "Ribosome", "Golgi Apparatus"],
+            "correct_answer": "Mitochondria",
+            "topic": "Cell Biology"
+        },
+        {
+            "id": 2,
+            "question": "Which of the following is NOT a part of the human digestive system?",
+            "options": ["Liver", "Pancreas", "Heart", "Small Intestine"],
+            "correct_answer": "Heart",
+            "topic": "Physiology"
+        },
+        {
+            "id": 3,
+            "question": "What is the basic unit of heredity?",
+            "options": ["Gene", "Chromosome", "DNA", "Protein"],
+            "correct_answer": "Gene",
+            "topic": "Genetics"
+        },
+        {
+            "id": 4,
+            "question": "Trade name of genetically engineered insulin is?",
+            "options": ["Beta insulin", "Humilin", "Anulin", "Gilbert/'s insulin"],
+            "correct_answer": "Humilin",
+            "topic": "Genetics"
+        },
+        {
+            "id": 5,
+            "question": "What is the consequence of a change in the genetic diversity",
+            "options": ["results in loss of biological diversity", "leads to an increase in the population", "results in loss of human species only", "causes pollution"],
+            "correct_answer": "results in loss of biological diversity",
+            "topic": "Genetics"
+        },
+        {
+            "id": 6,
+            "question": "In the rainy season, doors get swelled up due to",
+            "options": ["Transpiration", "Imbibition", "Diffusion", "Respiration"],
+            "correct_answer": "Imbibition",
+            "topic": "Physiology"
+        },
+        {
+            "id": 7,
+            "question": "In C3 and C4 plants, primary carboxylation takes place with the help of",
+            "options": ["PEP carboxylse and pyruvate carboxylase", "RuBP carboxylase and PEP carboxylase", "PEP carboxylase and RuBP carboxylase", "RuBP carboxylase and pyruvate carboxylase"],
+            "correct_answer": "RuBP carboxylase and PEP carboxylase",
+            "topic": "Physiology"
+        },
+        {
+            "id": 8,
+            "question": "A country with several different habitat types is said to have a high degree of",
+            "options": ["Genetic diversity", "Species diversity", "Biodiversity", "Habitat diversity"],
+            "correct_answer": "Habitat diversity",
+            "topic": "Genetics"
+        },
+        {
+            "id": 9,
+            "question": "Peroxisomes are involved in which type of reactions pertaining to plant photosynthesis?",
+            "options": ["Calvin Cycle", "Glycolytic cycle", "Glyoxylate cycle", "Bacterial photosynthesis"],
+            "correct_answer": "Glyoxylate cycle",
+            "topic": "Physiology"
+        },
+        {
+            "id": 10,
+            "question": "Macromolecule chitin is",
+            "options": ["phosphorous containing polysaccharide", "nitrogen containing polysaccharide", "sulphur containing polysaccharide", "simple polysaccharide"],
+            "correct_answer": "nitrogen containing polysaccharide",
+            "topic": "Physiology"
+        },
+        {
+            "id": 11,
+            "question": "Crossing over refers to",
+            "options": ["thickening of chromosome", "change in chromosome", "Mutation", "exchange of segments between sections of chromosome"],
+            "correct_answer": "exchange of segments between sections of chromosome",
+            "topic": "Genetics"
+        },
+        {
+            "id": 12,
+            "question": "This is a wrongly matched pair",
+            "options": ["Alcohol – Nitrogenase", "Detergents – Lipase", "Textile – Amylase", "Fruit juice – Pectinase"],
+            "correct_answer": "Gene",
+            "topic": "Physiology"
+        },
+        {
+            "id": 13,
+            "question": "This cell is the longest in the human body",
+            "options": ["Muscle cells", "Nerve cells", "Bone cells", "ProteGland cells"],
+            "correct_answer": "Nerve cells",
+            "topic": "Cell Biology"
+        },
+        {
+            "id": 14,
+            "question": "This structure of the plant cell is non-living",
+            "options": ["Nucleus", "cell wall", "cytoplasm", "Mitochondrion"],
+            "correct_answer": "cell wall",
+            "topic": "Cell Biology"
+        },
+        {
+            "id": 15,
+            "question": "Increasing genetic diversity interprets daughter chromosome contains genes from",
+            "options": ["None of the parents", "Single parent", "Both parents", "synthesis of own genes"],
+            "correct_answer": "Both parents",
+            "topic": "Genetics"
+        },
+        {
+            "id": 16,
+            "question": "A phenomenon occurring during prophase I of meiosis is",
+            "options": ["Mutation", "Synapsis", "Translation", "Crossing over"],
+            "correct_answer": "Synapsis",
+            "topic": "Genetics"
+        },
+        {
+            "id": 17,
+            "question": "This cell organelle does not contain DNA",
+            "options": ["Nucleus", "Mitochondria", "Lysosomes", "Chloroplast"],
+            "correct_answer": "Lysosomes",
+            "topic": "Cell Biology"
+        },
+        {
+            "id": 18,
+            "question": "The main difference between human cheek cells and onion peel cells is",
+            "options": ["Presence of cell wall in onion peel cells", "Presence of mitochondria in onion peel cells", "Absence of endoplasmic reticulum in cheek cells", "Absence of the plasma membrane in cheek cells"],
+            "correct_answer": "Presence of cell wall in onion peel cells",
+            "topic": "Cell Biology"
+        },
+        {
+            "id": 19,
+            "question": "The most abundant protein in the animal world is",
+            "options": ["Trypsin", "Collagen", "Haemoglobin", "Insulin"],
+            "correct_answer": "Collagen",
+            "topic": "Physiology"
+        },
+        {
+            "id": 20,
+            "question": "This biodiversity boosts the oxygen availability",
+            "options": ["Ecosystem diversity", "Species diversity", "Genetic diversity", "Cell diversity"],
+            "correct_answer": "Ecosystem diversity",
+            "topic": "Genetics"
+        }
+
+        
+    ]
+}

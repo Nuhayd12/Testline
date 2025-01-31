@@ -271,3 +271,97 @@ body {
 .logout-btn:hover {
     background-color: #dc2626;
 }
+
+.question-box {
+    padding: 20px;
+    background: #0f172a;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    transition: transform 0.3s ease-in-out;
+}
+
+.question-title {
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.question-text {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.options {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.option-label {
+    display: flex;
+    align-items: center;
+    background: #1e293b;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 5px 0;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.option-label:hover {
+    background: #d0eaff;
+}
+
+input[type="radio"] {
+    display: none;
+}
+
+.custom-radio {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid #007bff;
+    margin-right: 10px;
+    position: relative;
+}
+
+input[type="radio"]:checked + .custom-radio {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.quiz-navigation {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+button {
+    padding: 10px 15px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+#prev-btn {
+    display: none;
+}
+
+.results-container {
+    width: 50%;
+    margin: auto;
+    background: #10b981;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    margin-top: 100px;
+}
+
+
