@@ -1,10 +1,11 @@
-from flask import Flask, render_template, request, redirect, url_for,flash
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_bcrypt import Bcrypt
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, Length, ValidationError
 from flask_wtf import FlaskForm
+import pandas as pd
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret'
@@ -105,6 +106,52 @@ def login():
 @login_required
 def dashboard():
     return render_template('dashboard.html', username=current_user.username, email=current_user.email, phone=current_user.phone)
+
+# 📌 New Route: Test Instructions (Before taking a test)
+@app.route('/test-instructions')
+@login_required
+def test_instructions():
+    return render_template('test-instructions.html')
+
+# 📌 New Route: Quiz Instructions (Before taking a quiz)
+@app.route('/quiz-instructions')
+@login_required
+def quiz_instructions():
+    return render_template('quiz-instructions.html')
+
+# 📌 New Route: Start Test (After instructions)
+@app.route('/test')
+@login_required
+def test():
+    return render_template('test.html')
+
+# 📌 New Route: Start Quiz (After instructions)
+@app.route('/quiz')
+@login_required
+def quiz():
+    return render_template('quiz.html')
+
+@app.route('/quiz_results')
+@login_required
+def quiz_results():
+    user_id = session.get("user_id")  # Get logged-in user's ID
+
+    # Load latest recommendations
+    ai_recommendations = pd.read_csv("/mnt/data/ai_recommendations.csv")
+
+    # Filter recommendations for the current user
+    user_recommendations = ai_recommendations[ai_recommendations["User_ID"] == user_id].to_dict(orient="records")
+
+    return render_template("results.html", recommendations=user_recommendations)
+
+@app.route('/practice_more/<topic>')
+@login_required
+def practice_more(topic):
+    # Fetch questions from the weak topic
+    question_bank = pd.read_csv("/mnt/data/question_bank.csv")
+    topic_questions = question_bank[question_bank["topic"] == topic].to_dict(orient="records")
+
+    return render_template("quiz.html", questions=topic_questions)
 
 @app.route('/logout')
 @login_required

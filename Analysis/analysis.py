@@ -51,7 +51,6 @@ plt.xticks(rotation=45)
 plt.grid()
 plt.show()
 
-
 # Insights for teh mentors
 print("User Performance Summary")
 print(f"Overall Accuracy: {history_df['accuracy'].iloc[0]}%")

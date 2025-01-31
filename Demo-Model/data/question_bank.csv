@@ -1,0 +1,6 @@
+quiz_id,question_id,question,option_1,option_2,option_3,option_4,correct_option,difficulty,topic
+51,1001,What is the powerhouse of the cell?,Mitochondria,Ribosome,Nucleus,Golgi Apparatus,option_1,Easy,Cell Biology
+51,1002,What is the main function of the large intestine?,Digestion,Absorption of nutrients,Water absorption,Protein synthesis,option_3,Medium,Human Physiology
+51,1003,Which of the following is a prokaryotic organism?,Fungi,Bacteria,Algae,Protozoa,option_2,Easy,Microbiology
+51,1004,What is the role of hemoglobin in the blood?,Transport oxygen,Clot blood,Fight infections,Regulate pH,option_1,Medium,Human Physiology
+51,1005,Which macromolecule serves as the primary source of energy?,Proteins,Lipids,Carbohydrates,Nucleic acids,option_3,Easy,Biochemistry

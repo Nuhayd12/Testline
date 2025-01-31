@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script>
+        let timeLeft = 2700; // 45 minutes in seconds
+
+        function updateTimer() {
+            let minutes = Math.floor(timeLeft / 60);
+            let seconds = timeLeft % 60;
+            document.getElementById("timer").innerText = `${minutes}:${seconds}`;
+            if (timeLeft > 0) {
+                timeLeft--;
+                setTimeout(updateTimer, 1000);
+            } else {
+                document.getElementById("test-form").submit();
+            }
+        }
+
+        window.onload = function() {
+            updateTimer();
+        }
+    </script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="dashboard-card">
+            <h1>Biology Minor Test</h1>
+            <p>Time Remaining: <span id="timer">45:00</span></p>
+            <form id="test-form" action="/submit-test" method="POST">
+                <p>Q1: What is the function of hemoglobin?</p>
+                <input type="radio" name="q1" value="a"> Oxygen transport<br>
+                <input type="radio" name="q1" value="b"> Digestion<br>
+                <input type="radio" name="q1" value="c"> Excretion<br>
+                
+                <p>Q2: What is the normal pH level of blood?</p>
+                <input type="radio" name="q2" value="a"> 6.5<br>
+                <input type="radio" name="q2" value="b"> 7.4<br>
+                <input type="radio" name="q2" value="c"> 8.0<br>
+
+                <button type="submit" class="btn">Submit Test</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

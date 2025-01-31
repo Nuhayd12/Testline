@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Instructions</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script>
+        // Prevent tab switching
+        document.addEventListener("visibilitychange", function() {
+            if (document.hidden) {
+                alert("Tab switching is not allowed!");
+            }
+        });
+
+        // Request Camera Permission
+        async function requestCamera() {
+            try {
+                await navigator.mediaDevices.getUserMedia({ video: true });
+                console.log("Camera access granted");
+            } catch (error) {
+                alert("Camera access is required to proceed!");
+            }
+        }
+
+        function startTest() {
+            window.location.href = "/test";
+        }
+
+        window.onload = requestCamera;
+    </script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="dashboard-card">
+            <h1>Test Instructions</h1>
+            <p>Please follow these instructions before starting the test:</p>
+            <ul>
+                <li>Keep your camera **ON** during the test.</li>
+                <li>Do **not** switch tabs, or you may be disqualified.</li>
+                <li>The test is **timed** and cannot be paused.</li>
+            </ul>
+            <button class="btn start-test" onclick="startTest()">Start Test</button>
+        </div>
+    </div>
+</body>
+</html>

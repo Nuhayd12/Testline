@@ -114,3 +114,160 @@ input {
     display: none;
 }
 
+/* General Page Styling */
+body {
+    background-color: #0f172a;  /* Deep Blue for a dark theme */
+    color: #ffffff;
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+}
+
+/* Dashboard Container */
+.dashboard-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+}
+
+/* Dashboard Card */
+.dashboard-card {
+    background: rgba(255, 255, 255, 0.1);  /* Semi-transparent glass effect */
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0px 8px 20px rgba(255, 255, 255, 0.2);
+    text-align: center;
+    width: 400px;
+    backdrop-filter: blur(10px);
+}
+
+/* Section Styling */
+.topic-section, .quiz-section {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 20px;
+    margin: 15px 0;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.1);
+    transition: transform 0.3s ease-in-out;
+}
+
+.topic-section:hover, .quiz-section:hover {
+    transform: translateY(-5px);
+}
+
+/* Buttons */
+.btn {
+    display: inline-block;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+/* Start Test Button */
+.start-test {
+    background-color: #2563eb;  /* Blue */
+    color: white;
+}
+
+.start-test:hover {
+    background-color: #1d4ed8;
+}
+
+/* Start Quiz Button */
+.start-quiz {
+    background-color: #1d4ed8;  
+    color: white;
+}
+
+.start-quiz:hover {
+    background-color: #059669;
+}
+
+/* Logout Button */
+.logout-btn {
+    display: block;
+    background-color: #ef4444;  /* Red */
+    color: white;
+    margin-top: 15px;
+}
+
+.logout-btn:hover {
+    background-color: #dc2626;
+}
+
+body {
+    background-color: #0f172a;
+    color: #ffffff;
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.dashboard-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+}
+
+.dashboard-card {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0px 8px 20px rgba(255, 255, 255, 0.2);
+    text-align: center;
+    width: 400px;
+    backdrop-filter: blur(10px);
+}
+
+.btn {
+    display: inline-block;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.start-test {
+    background-color: #2563eb;
+    color: white;
+}
+
+.start-test:hover {
+    background-color: #1d4ed8;
+}
+
+.start-quiz {
+    background-color: #10b981;
+    color: white;
+}
+
+.start-quiz:hover {
+    background-color: #059669;
+}
+
+.logout-btn {
+    background-color: #ef4444;
+    color: white;
+    margin-top: 15px;
+}
+
+.logout-btn:hover {
+    background-color: #dc2626;
+}

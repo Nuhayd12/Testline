@@ -6,7 +6,7 @@ quiz_metadata = pd.DataFrame([
     {"Quiz_ID": 52, "Subject": "Physics", "Topic": "Kinematics", "Difficulty": "Hard", "Total_Questions": 30, "Duration (min)": 30},
     {"Quiz_ID": 53, "Subject": "Chemistry", "Topic": "Organic Chemistry", "Difficulty": "Medium", "Total_Questions": 40, "Duration (min)": 40}
 ])
-quiz_metadata.to_csv("/mnt/data/quiz_metadata.csv", index=False)
+quiz_metadata.to_csv("data/quiz_metadata.csv", index=False)
 
 question_bank = pd.DataFrame([
     {"quiz_id": 51, "question_id": 1001, "question": "What is the powerhouse of the cell?",
@@ -30,7 +30,7 @@ question_bank = pd.DataFrame([
      "correct_option": "option_3", "difficulty": "Easy", "topic": "Biochemistry"}
 ])
 
-question_bank.to_csv("/mnt/data/question_bank.csv", index=False)
+question_bank.to_csv("data/question_bank.csv", index=False)
 
 # Creating User Performance CSV
 user_performance = pd.DataFrame([
@@ -38,14 +38,14 @@ user_performance = pd.DataFrame([
     {"Attempt_ID": 2002, "User_ID": 1, "Quiz_ID": 51, "Question_ID": 1002, "Is_Correct": 0, "Time_Taken (sec)": 45},
     {"Attempt_ID": 2003, "User_ID": 1, "Quiz_ID": 52, "Question_ID": 1003, "Is_Correct": 1, "Time_Taken (sec)": 25}
 ])
-user_performance.to_csv("/mnt/data/user_performance.csv", index=False)
+user_performance.to_csv("data/user_performance.csv", index=False)
 
 # Creating AI Recommendations CSV
 ai_recommendations = pd.DataFrame([
     {"User_ID": 1, "Weak_Topics": "Body Fluids & Circulation", "Suggested_Actions": "Revise circulation concepts, focus on diagrams"},
     {"User_ID": 1, "Weak_Topics": "Kinematics", "Suggested_Actions": "Practice motion equations, attempt more hard-level questions"}
 ])
-ai_recommendations.to_csv("/mnt/data/ai_recommendations.csv", index=False)
+ai_recommendations.to_csv("data/ai_recommendations.csv", index=False)
 
 # Return file paths
 ["data/quiz_metadata.csv", "data/question_bank.csv", "data/user_performance.csv", "data/ai_recommendations.csv"]

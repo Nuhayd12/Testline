@@ -1,0 +1,4 @@
+Attempt_ID,User_ID,Quiz_ID,Question_ID,Is_Correct,Time_Taken (sec)
+2001,1,51,1001,1,30
+2002,1,51,1002,0,45
+2003,1,52,1003,0,25
