@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for,flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_bcrypt import Bcrypt
@@ -65,23 +65,27 @@ def home():
 def signup():
     form = RegisterForm()
     if form.validate_on_submit():
+        email = form.email.data
+        existing_user = User.query.filter_by(email=email).first()
+        if existing_user:
+            flash("⚠️ Account already exists! Please log in.", "error")
+            return redirect(url_for('signup')) 
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')  # Hash password
-
+        
         new_user = User(
             username=form.username.data,
             phone=form.phone.data,
             email=form.email.data,
             password=hashed_password  # Store the hashed password
         )
+
         db.session.add(new_user)
         db.session.commit()
 
-        print(f"User {new_user.username} registered successfully!")  # Debugging
+        flash("✅ Account created successfully! Please log in.", "success")
         return redirect(url_for('login'))
 
     return render_template('signup.html', form=form)
-
-
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -91,13 +95,11 @@ def login():
 
         if user and bcrypt.check_password_hash(user.password, form.password.data):  # Check hashed password
             login_user(user)
-            print(f"User {user.username} logged in successfully!")  # Debugging
             return redirect(url_for('dashboard'))
-
-        print("Invalid email or password!")  # Debugging
+        flash("⚠️ Invalid email or password!", "error")
+        return redirect(url_for('login'))
 
     return render_template('login.html', form=form)
-
 
 @app.route('/dashboard')
 @login_required

@@ -9,24 +9,55 @@
 <body>
     <div class="container">
         <h2>Sign Up</h2>
+
+        <!-- Flash Message Container -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash flash-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
         <form method="POST" action="{{ url_for('signup') }}">
-            {{ form.hidden_tag() }}  <!-- CSRF protection -->
-            
             <label for="username">Full Name:</label>
-            {{ form.username() }}
+            <input type="text" name="username" placeholder="Enter your full name" required>
 
             <label for="phone">Phone:</label>
-            {{ form.phone() }}
+            <input type="text" name="phone" placeholder="Enter your phone number" required>
 
             <label for="email">Email:</label>
-            {{ form.email() }}
+            <input type="email" name="email" placeholder="Enter your email" required>
 
             <label for="password">Password:</label>
-            {{ form.password() }}
+            <input type="password" name="password" placeholder="Enter your password" required>
 
-            {{ form.submit() }}  <!-- Submit button -->
+            <button type="submit" class="btn-primary">Sign Up</button>
         </form>
-        <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
+
+        <p>Already have an account?</p>
+        <a href="{{ url_for('login') }}" class="btn-secondary">Login</a>
+        <div id="arrow-animation" class="hidden">➡️</div> <!-- Animated Arrow -->
     </div>
+
+    <script>
+        window.onload = function() {
+            var messages = document.querySelectorAll('.flash');
+            if (messages.length > 0) {
+                setTimeout(() => {
+                    messages.forEach(msg => msg.style.display = 'none');
+                }, 3000);
+            }
+
+            var errorMessage = document.querySelector(".flash-error");
+            if (errorMessage) {
+                var arrow = document.getElementById("arrow-animation");
+                arrow.classList.remove("hidden");
+                arrow.classList.add("arrow-move");
+            }
+        };
+    </script>
 </body>
 </html>
