@@ -6,13 +6,17 @@ from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, Length, ValidationError
 from flask_wtf import FlaskForm
 import pandas as pd
+import matplotlib
+matplotlib.use('Agg')
 import json,os,traceback
 import matplotlib.pyplot as plt
 from collections import defaultdict
 from recommendation import load_data,calculate_scores,generate_pie_chart,generate_recommendations
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
@@ -299,7 +303,7 @@ def submit():
 @app.route('/generate_analysis/<user_id>', methods=['GET'])
 @login_required
 def generate_analysis(user_id):
-    # Replace this with the logic to get the logged-in user's data
+    # Load the user's quiz and performance data
     quiz_file = "data/quiz.json"
     performance_file = "data/user_performance.json"
     quiz_data, performance_data = load_data(quiz_file, performance_file)
@@ -307,34 +311,41 @@ def generate_analysis(user_id):
     # Calculate scores and topic questions
     topic_scores, topic_questions = calculate_scores(quiz_data, performance_data)
 
-    # Generate Recommendations
+    # Generate recommendations based on weak topics
     recommendations = generate_recommendations(topic_scores, topic_questions)
 
-    # Create pie chart and save it
-    chart_dir = "/charts"
-    chart_path = generate_pie_chart(user_id, topic_scores, recommendations, chart_dir=chart_dir)
+    # Generate pie chart for visualizing performance
+    chart_dir = f"charts/user_{user_id}_analysis.png"
+    chart_path = generate_pie_chart(user_id, topic_scores, recommendations, chart_dir)
 
-    # Fetch recommendations for video links specific to weak topics
+    # Generate video recommendations
     weak_topics = recommendations.get(user_id, [])
     video_recommendations = []
     if weak_topics:
         videos = {
-            "Biology": [
-                {"title": "Plant Physiology Basics | NEET", "url": "https://www.youtube.com/watch?v=example5", "thumbnail": "https://img.youtube.com/vi/example5/0.jpg"},
-                {"title": "Genetics Overview - NEET", "url": "https://www.youtube.com/watch?v=example6", "thumbnail": "https://img.youtube.com/vi/example6/0.jpg"},
-                {"title": "Genetics Overview - NEET", "url": "https://www.youtube.com/watch?v=oGI7dppRMjY", "thumbnail": "https://i.ytimg.com/an_webp/TPauOWkHbdE/mqdefault_6s.webp?du=3000&sqp=CNis-bwG&rs=AOn4CLAl_6n7KXmvykap3mqJKcFSRrBDuQ"}]
+            "Genetics": [
+                {"title": "Introduction to Genetics", "url": "https://www.youtube.com/watch?v=example1", "thumbnail": "https://img.youtube.com/vi/example1/0.jpg"},
+                {"title": "Gene Expression and Regulation", "url": "https://www.youtube.com/watch?v=example2", "thumbnail": "https://img.youtube.com/vi/example2/0.jpg"}
+            ],
+            "Cell Biology": [
+                {"title": "Plant Cell Overview", "url": "https://www.youtube.com/watch?v=example3", "thumbnail": "https://img.youtube.com/vi/example3/0.jpg"},
+                {"title": "Organelles and Functions", "url": "https://www.youtube.com/watch?v=example4", "thumbnail": "https://img.youtube.com/vi/example4/0.jpg"}
+            ],
+            "Physiology": [
+                {"title": "Introduction to Physiology", "url": "https://www.youtube.com/watch?v=example5", "thumbnail": "https://img.youtube.com/vi/example5/0.jpg"}
+            ]
         }
-        # Only retrieve recommendations for weak topics
-        for topic in weak_topics:
-            if topic in videos:
-                video_recommendations.extend(videos[topic])
+        # Dynamically fetch videos based on weak topics
+        for weak_topic in weak_topics:
+            if weak_topic in videos:
+                video_recommendations.extend(videos[weak_topic])
 
+    # Return the data as JSON
     return jsonify({
-        "chart_url": f"/data/{chart_path}",  # Path to the generated pie chart
-        "recommendations": recommendations.get(user_id, []),  # User's recommendations
+        "chart_url": f"/{chart_path}",  # Path to the generated pie chart
+        "recommendations": recommendations.get(user_id, []),  # List of weak topic recommendations
         "video_recommendations": video_recommendations  # List of video links and thumbnails
     })
-
 
 @app.route('/practice_more/<topic>')
 @login_required
@@ -355,4 +366,4 @@ def logout():
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    app.run(debug=True)
+    app.run(debug=True, threaded=False)

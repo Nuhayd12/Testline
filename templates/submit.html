@@ -10,7 +10,6 @@
 
 <body>
     <div class="dashboard-container">
-        <!-- Quiz Results -->
         <div class="dashboard-card">
             <h1>Quiz Results</h1>
             <h2 id="score"></h2>
@@ -25,40 +24,35 @@
                         </tr>
                     </thead>
                     <tbody id="results-table-body">
-                        <!-- Rows will be populated dynamically -->
+                        <!-- Rows will be dynamically inserted -->
                     </tbody>
                 </table>
             </div>
-            <br>
         </div>
 
-        <!-- Analysis Section -->
+        <!-- Generate Analysis Button -->
         <div class="analysis-button">
             <button id="generate-analysis-btn">Generate Analysis</button>
         </div>
-        
+
+        <!-- Analysis Section (Dynamically Populated) -->
         <div id="analysis-container" style="display: none; margin-top: 20px;">
-            <!-- Performance Analysis Chart -->
             <h3>Performance Analysis</h3>
             <img id="analysis-chart" src="" alt="Performance Chart" style="max-width: 100%; margin-bottom: 20px;">
 
-            <!-- Recommendations -->
             <h3>Recommendations:</h3>
-            <ul id="recommendations-list" style="margin-bottom: 20px;"></ul>
+            <ul id="recommendations-list"></ul>
 
-            <!-- Video Recommendations -->
             <h3>Recommended Videos:</h3>
             <div id="video-recommendations" style="display: flex; flex-wrap: wrap; gap: 10px;">
-                <!-- Video thumbnails and links will be added dynamically -->
+                <!-- Video thumbnails and links will populate dynamically -->
             </div>
         </div>
     </div>
 
     <script>
-        const tbody = document.getElementById("results-table-body");
-
+        // Fetch and populate quiz results
         document.addEventListener("DOMContentLoaded", function () {
-            // Fetch the quiz results
             fetch("/submit_quiz", { method: "POST" })
                 .then(response => response.json())
                 .then(data => {
@@ -67,47 +61,47 @@
                         return;
                     }
 
-                    // Populate the score
+                    // Populate results table
                     document.getElementById("score").innerText = `Your Score: ${data.score}`;
+                    const resultsTableBody = document.getElementById("results-table-body");
+                    resultsTableBody.innerHTML = "";
 
-                    // Populate the answers table
-                    tbody.innerHTML = ""; // Clear any existing rows
-                    data.answers.forEach(q => {
+                    data.answers.forEach(answer => {
                         const row = `<tr>
-                                <td>${q.question}</td>
-                                <td>${q.topic}</td>
-                                <td>${q.marked_answer}</td>
-                                <td>${q.correct_answer}</td>
-                            </tr>`;
-                        tbody.innerHTML += row;
+                            <td>${answer.question}</td>
+                            <td>${answer.topic}</td>
+                            <td>${answer.marked_answer}</td>
+                            <td>${answer.correct_answer}</td>
+                        </tr>`;
+                        resultsTableBody.innerHTML += row;
                     });
                 })
                 .catch(error => console.error("Error fetching quiz results:", error));
         });
 
-        // Generate Analysis on button click
+        // Generate Performance Analysis
         document.getElementById("generate-analysis-btn").addEventListener("click", function () {
-            const userID = "<insert_logged_in_user_id>"; // Replace with logic for the logged-in user's ID
+            const userID = "<insert_logged_in_user_id>"; // Dynamically retrieve logged-in user ID
             fetch(`/generate_analysis/${userID}`)
                 .then(response => response.json())
                 .then(data => {
-                    const analysisContainer = document.getElementById("analysis-container");
+                    document.getElementById("analysis-container").style.display = "block";
 
-                    // Insert the chart
+                    // Update pie chart
                     document.getElementById("analysis-chart").src = data.chart_url;
 
-                    // Insert the recommendations
+                    // Update recommendations
                     const recommendationsList = document.getElementById("recommendations-list");
-                    recommendationsList.innerHTML = "";
+                    recommendationsList.innerHTML = ""; // Clear existing recommendations
                     data.recommendations.forEach(rec => {
                         const li = document.createElement("li");
                         li.textContent = rec;
                         recommendationsList.appendChild(li);
                     });
 
-                    // Insert video recommendations
+                    // Update video recommendations
                     const videoContainer = document.getElementById("video-recommendations");
-                    videoContainer.innerHTML = ""; // Clear existing content
+                    videoContainer.innerHTML = ""; // Clear existing video cards
                     data.video_recommendations.forEach(video => {
                         const videoCard = `
                             <div style="border: 1px solid #ddd; padding: 10px; width: 250px;">
@@ -117,9 +111,8 @@
                         videoContainer.innerHTML += videoCard;
                     });
 
-                    // Show the analysis section and scroll to it
-                    analysisContainer.style.display = "block";
-                    analysisContainer.scrollIntoView({ behavior: "smooth" });
+                    // Scroll to the analysis section
+                    document.getElementById("analysis-container").scrollIntoView({ behavior: "smooth" });
                 })
                 .catch(error => console.error("Error generating analysis:", error));
         });
