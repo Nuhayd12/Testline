@@ -1,54 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz Results</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
+
 <body>
     <div class="dashboard-container">
+        <!-- Quiz Results -->
         <div class="dashboard-card">
             <h1>Quiz Results</h1>
             <h2 id="score"></h2>
             <div id="results-container">
-            <table>  <!-- Moved id here -->
-                <thead>
-                    <tr>
-                        <th>Question</th>
-                        <th>Topic</th>
-                        <th>Your Answer</th>
-                        <th>Correct Answer</th>
-                    </tr>
-                </thead>
-                <tbody id="results-table-body">
-                    <!-- Table rows will be added dynamically -->
-                </tbody>
-            </table><br><br>
-        </div id = "login-back">
-            <a href="/">Back to login</a>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Question</th>
+                            <th>Topic</th>
+                            <th>Your Answer</th>
+                            <th>Correct Answer</th>
+                        </tr>
+                    </thead>
+                    <tbody id="results-table-body">
+                        <!-- Rows will be populated dynamically -->
+                    </tbody>
+                </table>
+            </div>
+            <br>
+        </div>
+
+        <!-- Analysis Section -->
+        <div class="analysis-button">
+            <button id="generate-analysis-btn">Generate Analysis</button>
+        </div>
+        
+        <div id="analysis-container" style="display: none; margin-top: 20px;">
+            <!-- Performance Analysis Chart -->
+            <h3>Performance Analysis</h3>
+            <img id="analysis-chart" src="" alt="Performance Chart" style="max-width: 100%; margin-bottom: 20px;">
+
+            <!-- Recommendations -->
+            <h3>Recommendations:</h3>
+            <ul id="recommendations-list" style="margin-bottom: 20px;"></ul>
+
+            <!-- Video Recommendations -->
+            <h3>Recommended Videos:</h3>
+            <div id="video-recommendations" style="display: flex; flex-wrap: wrap; gap: 10px;">
+                <!-- Video thumbnails and links will be added dynamically -->
+            </div>
         </div>
     </div>
-    <div class="analysis-button">
-        <button id="generate-analysis-btn">Generate Analysis</button>
-    </div>
-    <div id="analysis-chart-container" style="display: none; margin-top: 20px;">
-        <h3>Performance Analysis</h3>
-        <img id="analysis-chart" src="" alt="Performance Chart" style="max-width: 100%; height: auto;">
-
-        <h3>Recommendations:</h3>
-        <ul id="recommendations-list"></ul>
-
-        <h3>Recommended Videos:</h3>
-        <div id="video-recommendations" style="display: flex; flex-wrap: wrap; gap: 10px;">
-            <!-- Video thumbnails and links will be added dynamically -->
-        </div>
-    </div>
-    
 
     <script>
-        const tbody = document.getElementById('results-table-body');
+        const tbody = document.getElementById("results-table-body");
+
         document.addEventListener("DOMContentLoaded", function () {
+            // Fetch the quiz results
             fetch("/submit_quiz", { method: "POST" })
                 .then(response => response.json())
                 .then(data => {
@@ -57,84 +67,63 @@
                         return;
                     }
 
-                    // Display the score
+                    // Populate the score
                     document.getElementById("score").innerText = `Your Score: ${data.score}`;
 
-                    // Populate the table
-                    const resultsContainer = document.getElementById("results-container");
-                    const tbody = resultsContainer.querySelector('tbody'); // Get tbody element
-
+                    // Populate the answers table
                     tbody.innerHTML = ""; // Clear any existing rows
-
                     data.answers.forEach(q => {
                         const row = `<tr>
-                                        <td>${q.question}</td>
-                                        <td>${q.topic}</td>
-                                        <td>${q.marked_answer}</td>
-                                        <td>${q.correct_answer}</td>
-                                    </tr>`;
+                                <td>${q.question}</td>
+                                <td>${q.topic}</td>
+                                <td>${q.marked_answer}</td>
+                                <td>${q.correct_answer}</td>
+                            </tr>`;
                         tbody.innerHTML += row;
                     });
                 })
                 .catch(error => console.error("Error fetching quiz results:", error));
         });
+
+        // Generate Analysis on button click
         document.getElementById("generate-analysis-btn").addEventListener("click", function () {
-            fetch(`/generate_analysis/<user_id>`)
-                .then(response => response.json())
-                .then(data => {
-                    const analysisContainer = document.getElementById("analysis-chart-container");
-                    document.getElementById("analysis-chart").src = data.chart_url;
-    
-                    const recommendationsList = document.getElementById("recommendations-list");
-                    recommendationsList.innerHTML = "";
-                    data.recommendations.forEach(rec => {
-                        const li = document.createElement('li');
-                        li.textContent = rec;
-                        recommendationsList.appendChild(li);
-                    });
-    
-                    analysisContainer.style.display = "block";
-                })
-                .catch(error => console.error("Error generating analysis:", error));
-        });
-        document.getElementById("generate-analysis-btn").addEventListener("click", function () {
-            const userID = "<insert_logged_in_user_id>";  // Update with logic to fetch logged-in user's ID dynamically
+            const userID = "<insert_logged_in_user_id>"; // Replace with logic for the logged-in user's ID
             fetch(`/generate_analysis/${userID}`)
                 .then(response => response.json())
                 .then(data => {
-                    const analysisContainer = document.getElementById("analysis-chart-container");
+                    const analysisContainer = document.getElementById("analysis-container");
 
-                    // Update the chart
+                    // Insert the chart
                     document.getElementById("analysis-chart").src = data.chart_url;
 
-                    // Update the recommendations
+                    // Insert the recommendations
                     const recommendationsList = document.getElementById("recommendations-list");
                     recommendationsList.innerHTML = "";
                     data.recommendations.forEach(rec => {
-                        const li = document.createElement('li');
+                        const li = document.createElement("li");
                         li.textContent = rec;
                         recommendationsList.appendChild(li);
                     });
 
-                    // Update video recommendations
+                    // Insert video recommendations
                     const videoContainer = document.getElementById("video-recommendations");
-                    videoContainer.innerHTML = "";  // Clear existing video thumbnails
+                    videoContainer.innerHTML = ""; // Clear existing content
                     data.video_recommendations.forEach(video => {
                         const videoCard = `
                             <div style="border: 1px solid #ddd; padding: 10px; width: 250px;">
                                 <img src="${video.thumbnail}" alt="${video.title}" style="width: 100%; height: auto;">
                                 <p><a href="${video.url}" target="_blank">${video.title}</a></p>
-                            </div>
-                        `;
+                            </div>`;
                         videoContainer.innerHTML += videoCard;
                     });
 
+                    // Show the analysis section and scroll to it
                     analysisContainer.style.display = "block";
-                    analysisContainer.scrollIntoView({ behavior: "smooth" });  // Scroll to the analysis section
+                    analysisContainer.scrollIntoView({ behavior: "smooth" });
                 })
                 .catch(error => console.error("Error generating analysis:", error));
         });
     </script>
 </body>
-</html>
 
+</html>
