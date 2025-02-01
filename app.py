@@ -7,7 +7,9 @@ from wtforms.validators import InputRequired, Length, ValidationError
 from flask_wtf import FlaskForm
 import pandas as pd
 import json,os,traceback
-
+import matplotlib.pyplot as plt
+from collections import defaultdict
+from recommendation import load_data,calculate_scores,generate_pie_chart,generate_recommendations
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
@@ -255,12 +257,17 @@ def save_quiz():
         traceback.print_exc()  # Print full error traceback in the terminal
         return jsonify({"error": str(e)}), 500
 
+def truncate_text(text, max_length=50):
+    """Truncates text to a maximum length, adding an ellipsis if necessary."""
+    if len(text) > max_length:
+        return text[:max_length - 3] + "..."
+    return text
 
 @app.route("/submit_quiz", methods=["POST"])
 @login_required
 def submit_quiz():
     """Calculate quiz score and return results."""
-    user_id = get_user_id()
+    user_id = str(get_user_id())  # Convert user ID to string
     if not user_id:
         return jsonify({"error": "User not authenticated"}), 401
 
@@ -273,21 +280,61 @@ def submit_quiz():
     if user_id not in user_performance:
         return jsonify({"error": "No answers recorded for this user!"}), 500
 
-    score = sum(4 for entry in user_performance[user_id] if entry["marked_answer"] == entry["correct_answer"])
     total_questions = len(user_performance[user_id])
+    score = sum(4 if entry["marked_answer"] == entry["correct_answer"] else -1 for entry in user_performance[user_id])
+    max_score = total_questions * 4  # Max possible score
 
     return jsonify({
         "message": "Quiz submitted successfully!",
-        "score": f"{score}/{total_questions}",
-        "answers": user_performance[user_id]
+        "score": f"{score}/{max_score}",
+        "answers": user_performance[user_id]  # Return full answer list
     })
-
 
 
 @app.route('/submit')
 @login_required
 def submit():
     return render_template("submit.html")
+
+@app.route('/generate_analysis/<user_id>', methods=['GET'])
+@login_required
+def generate_analysis(user_id):
+    # Replace this with the logic to get the logged-in user's data
+    quiz_file = "data/quiz.json"
+    performance_file = "data/user_performance.json"
+    quiz_data, performance_data = load_data(quiz_file, performance_file)
+
+    # Calculate scores and topic questions
+    topic_scores, topic_questions = calculate_scores(quiz_data, performance_data)
+
+    # Generate Recommendations
+    recommendations = generate_recommendations(topic_scores, topic_questions)
+
+    # Create pie chart and save it
+    chart_dir = "/charts"
+    chart_path = generate_pie_chart(user_id, topic_scores, recommendations, chart_dir=chart_dir)
+
+    # Fetch recommendations for video links specific to weak topics
+    weak_topics = recommendations.get(user_id, [])
+    video_recommendations = []
+    if weak_topics:
+        videos = {
+            "Biology": [
+                {"title": "Plant Physiology Basics | NEET", "url": "https://www.youtube.com/watch?v=example5", "thumbnail": "https://img.youtube.com/vi/example5/0.jpg"},
+                {"title": "Genetics Overview - NEET", "url": "https://www.youtube.com/watch?v=example6", "thumbnail": "https://img.youtube.com/vi/example6/0.jpg"},
+                {"title": "Genetics Overview - NEET", "url": "https://www.youtube.com/watch?v=oGI7dppRMjY", "thumbnail": "https://i.ytimg.com/an_webp/TPauOWkHbdE/mqdefault_6s.webp?du=3000&sqp=CNis-bwG&rs=AOn4CLAl_6n7KXmvykap3mqJKcFSRrBDuQ"}]
+        }
+        # Only retrieve recommendations for weak topics
+        for topic in weak_topics:
+            if topic in videos:
+                video_recommendations.extend(videos[topic])
+
+    return jsonify({
+        "chart_url": f"/data/{chart_path}",  # Path to the generated pie chart
+        "recommendations": recommendations.get(user_id, []),  # User's recommendations
+        "video_recommendations": video_recommendations  # List of video links and thumbnails
+    })
+
 
 @app.route('/practice_more/<topic>')
 @login_required
@@ -297,6 +344,7 @@ def practice_more(topic):
     topic_questions = question_bank[question_bank["topic"] == topic].to_dict(orient="records")
 
     return render_template("new_questions.html", questions=topic_questions)
+
 
 @app.route('/logout')
 @login_required

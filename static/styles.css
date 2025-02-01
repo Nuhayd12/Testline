@@ -353,18 +353,62 @@ button:hover {
 #prev-btn {
     display: none;
 }
-
-.results-container {
-    width: 50%;
-    margin: auto;
-    background: #10b981;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-    margin-top: 100px;
+.dashboard-container {
+    display: flex; /* Ensure flexbox layout for proper alignment */
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    margin: 0;
 }
 
-table
-{
-    max-width: fit-content;
+.dashboard-card {
+    width: auto; /* Let the card expand */
+    max-width: 90vw; /* Set a maximum width to prevent excessive expansion */
+    background: rgba(255, 255, 255, 0.1);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0px 8px 20px rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
 }
+
+#results-container {
+    overflow: auto; /* Enable scrolling for the container */
+    height: 500px; /* Adjust as needed */
+    width: 100%; /* The container takes up full width */
+}
+
+table {
+    width: auto; /* Let the table expand to its natural width */
+    border-collapse: collapse;
+    border-spacing: 0; /* Remove extra space between cells */
+    table-layout: auto; /* Allow cells to expand to their content */
+}
+
+
+/* Style table cells */
+table th, 
+table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+    word-break: break-all; /* Allow words to break if needed */
+    overflow-wrap: anywhere; /* Allow long lines to break */
+    box-sizing: border-box;
+}
+
+/*Styling for thead to prevent interference with scrolling*/
+thead {
+    display: table-header-group;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background-color: #10b981;
+}
+
+/* Style for all table header */
+th {
+    background-color: #10b981;
+    color: white;
+}
+
