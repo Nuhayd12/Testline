@@ -8,158 +8,128 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
     <script>
-        
-        let timeLeft = 1800; // 45 minutes in seconds
-        let currentQuestion = 0;
-        let questions = [];
-        let userAnswers = {}; // Store selected answers
+        let timeLeft = 1800; // 30 minutes timer
+    let currentQuestion = 0;
+    let questions = [];
+    let userAnswers = {}; 
+    let answersSaved = false; // Ensure saving before submission
 
-        // Update the countdown timer
-        function updateTimer() {
-            let minutes = Math.floor(timeLeft / 60);
-            let seconds = timeLeft % 60;
-            document.getElementById("timer").innerText = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-            if (timeLeft > 0) {
-                timeLeft--;
-                setTimeout(updateTimer, 1000);
-            } else {
-                document.getElementById("test-form").submit();
-            }
+    async function fetchQuestions() {
+        try {
+            const response = await fetch('/get_quiz_questions');
+            questions = await response.json();
+            renderQuestion();
+        } catch (error) {
+            console.error("Error fetching questions:", error);
         }
-
-        // Fetch quiz questions from backend
-        async function fetchQuestions() {
-            try {
-                const response = await fetch('/get_quiz_questions');
-                questions = await response.json();
-                renderQuestion();
-            } catch (error) {
-                console.error("Error fetching questions:", error);
-            }
-        }
-
-        // Render a single question based on `currentQuestion`
-        function renderQuestion() {
-            if (questions.length === 0) return;
-
-            const questionContainer = document.getElementById("question-container");
-            questionContainer.innerHTML = ""; // Clear previous content
-
-            let questionData = questions[currentQuestion];
-            let questionElement = document.createElement("div");
-            questionElement.classList.add("question-box");
-
-            questionElement.innerHTML = `
-                <h2 class="question-title">Question ${currentQuestion + 1}</h2>
-                <p class="question-text">${questionData.question}</p>
-                <div class="options">
-                    ${questionData.options.map((opt, index) => `
-                        <label class="option-label">
-                            <input type="radio" name="q${questionData.id}" value="${opt}" 
-                                ${userAnswers[`q${questionData.id}`] === opt ? "checked" : ""} 
-                                onchange="saveAnswer('q${questionData.id}', '${opt}')">
-                            <span class="custom-radio"></span>
-                            ${opt}
-                        </label>
-                    `).join('')}
-                </div>
-            `;
-
-            questionContainer.appendChild(questionElement);
-
-            // Hide "Previous" button for the first question
-            document.getElementById("prev-btn").style.display = currentQuestion === 0 ? "none" : "inline-block";
-
-            // Show "Submit" button only on last question
-            document.getElementById("submit-btn").style.display = currentQuestion === questions.length - 1 ? "inline-block" : "none";
-
-            // Hide "Next" button on last question
-            document.getElementById("next-btn").style.display = currentQuestion === questions.length - 1 ? "none" : "inline-block";
-        }
-
-        // Save user's selected answer
-        function saveAnswer(questionId, answer) {
-            userAnswers[questionId] = answer;
-        }
-
-        // Navigate to the next question
-        function nextQuestion() {
-            if (currentQuestion < questions.length - 1) {
-                currentQuestion++;
-                renderQuestion();
-            }
-        }
-
-        // Navigate to the previous question
-        function prevQuestion() {
-            if (currentQuestion > 0) {
-                currentQuestion--;
-                renderQuestion();
-            }
-        }
-        function submitQuiz() {
-            fetch('/submit_quiz', {
-                method: 'POST',
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(userAnswers)
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert("Quiz submitted successfully!");
-        
-                if (data.message === "confetti") {
-                    // Show confetti animation
-                    showConfetti();
-                } else if (data.message === "well_done") {
-                    alert("Well done! Keep improving.");
-                } else {
-                    alert("Check your answers carefully.");
-                }
-        
-                window.location.href = "/submit"; 
-            })
-            .catch(error => console.error("Error submitting quiz:", error));
-        }
-        
-
-        // Initialize the page on load
-        window.onload = function() {
-            updateTimer();
-            fetchQuestions();
-        }
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-    <script>
-    function showConfetti() {
-        confetti({
-            particleCount: 150,
-            spread: 70,
-            origin: { y: 0.6 }
-        });
     }
 
-    // Check score message
-    document.addEventListener("DOMContentLoaded", function () {
-        const scoreMessage = "{{ message }}";
+    function renderQuestion() {
+        if (questions.length === 0) return;
 
-        if (scoreMessage === "confetti") {
-            showConfetti();
-        } else if (scoreMessage === "well_done") {
-            alert("Well done! Keep it up!");
-        } else {
-            alert("Check your answers carefully.");
+        const questionContainer = document.getElementById("question-container");
+        questionContainer.innerHTML = "";
+
+        let questionData = questions[currentQuestion];
+        let questionElement = document.createElement("div");
+        questionElement.classList.add("question-box");
+
+        questionElement.innerHTML = `
+            <h2 class="question-title">Question ${currentQuestion + 1}</h2>
+            <p class="question-text">${questionData.question}</p>
+            <div class="options">
+                ${questionData.options.map(opt => `
+                    <label class="option-label">
+                        <input type="radio" name="q${questionData.id}" value="${opt}" 
+                            ${userAnswers[`q${questionData.id}`] === opt ? "checked" : ""} 
+                            onchange="saveAnswer('q${questionData.id}', '${opt}')">
+                        <span class="custom-radio"></span>
+                        ${opt}
+                    </label>
+                `).join('')}
+            </div>
+        `;
+
+        questionContainer.appendChild(questionElement);
+
+        document.getElementById("prev-btn").style.display = currentQuestion === 0 ? "none" : "inline-block";
+        document.getElementById("next-btn").style.display = currentQuestion === questions.length - 1 ? "none" : "inline-block";
+        document.getElementById("save-btn").style.display = currentQuestion === questions.length - 1 ? "inline-block" : "none";
+        document.getElementById("submit-btn").style.display = "none";
+    }
+
+    function saveAnswer(questionId, answer) {
+        userAnswers[questionId] = answer;
+    }
+
+    function nextQuestion() {
+        if (currentQuestion < questions.length - 1) {
+            currentQuestion++;
+            renderQuestion();
         }
-    });
-    </script>
+    }
 
+    function prevQuestion() {
+        if (currentQuestion > 0) {
+            currentQuestion--;
+            renderQuestion();
+        }
+    }
+
+    function saveQuiz() {
+    fetch('/save_quiz', {
+        method: 'POST',
+        headers: { "Content-Type": "application/json" }, 
+        body: JSON.stringify({ answers: userAnswers }) // Ensure correct formatting
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.saved) {
+            answersSaved = true;
+            alert("Answers saved successfully!");
+            document.getElementById("submit-btn").style.display = "inline-block";
+        }
+    })
+    .catch(error => console.error("Error saving quiz:", error));
+}
+
+
+    function submitQuiz() {
+        if (!answersSaved) {
+            alert("Please save your answers before submitting.");
+            return;
+        }
+
+        fetch('/submit_quiz', {
+            method: 'POST',
+            headers: { "Content-Type": "application/json" }
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(`Quiz Submitted!\nScore: ${data.score}`);
+            localStorage.setItem("quizResults", JSON.stringify(data.answers));
+            window.location.href = "/submit";
+        })
+        .catch(error => console.error("Error submitting quiz:", error));
+    }
+
+    window.onload = function() {
+        fetchQuestions();
+    }
+
+        
+    </script>
 </head>
 <body>
     <div class="dashboard-container">
         <div class="dashboard-card">
             <h1>Biology Minor Test</h1>
-            <p>Time Remaining: <span id="timer">45:00</span></p>
+            <p>Time Remaining: <span id="timer">30:00</span></p>
 
             <form id="test-form">
                 <div id="question-container">
@@ -170,6 +140,7 @@
             <div class="quiz-navigation">
                 <button id="prev-btn" onclick="prevQuestion()">⬅ Previous</button>
                 <button id="next-btn" onclick="nextQuestion()">Next ➡</button>
+                <button id="save-btn" onclick="saveQuiz()">Save Answers</button>
                 <button id="submit-btn" onclick="submitQuiz()" style="display: none;">Submit Quiz</button>
             </div>
         </div>

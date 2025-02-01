@@ -22,19 +22,21 @@
         {% endwith %}
 
         <form method="POST" action="{{ url_for('signup') }}">
+            {{ form.hidden_tag() }}  <!-- CSRF protection -->
+            
             <label for="username">Full Name:</label>
-            <input type="text" name="username" placeholder="Enter your full name" required>
+            {{ form.username(value="") }}
 
             <label for="phone">Phone:</label>
-            <input type="text" name="phone" placeholder="Enter your phone number" required>
+            {{ form.phone(value="") }}
 
             <label for="email">Email:</label>
-            <input type="email" name="email" placeholder="Enter your email" required>
+            {{ form.email(value="") }}
 
             <label for="password">Password:</label>
-            <input type="password" name="password" placeholder="Enter your password" required>
+            {{ form.password(value="") }}
 
-            <button type="submit" class="btn-primary">Sign Up</button>
+            <input class="btn-primary" id="submit" name="submit" type="submit" value="Sign Up">
         </form>
 
         <p>Already have an account?</p>

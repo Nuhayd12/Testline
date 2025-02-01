@@ -24,7 +24,7 @@
         {
             "id": 4,
             "question": "Trade name of genetically engineered insulin is?",
-            "options": ["Beta insulin", "Humilin", "Anulin", "Gilbert/'s insulin"],
+            "options": ["Beta insulin", "Humilin", "Anulin", "Gilbert's insulin"],
             "correct_answer": "Humilin",
             "topic": "Genetics"
         },
@@ -80,7 +80,7 @@
         {
             "id": 12,
             "question": "This is a wrongly matched pair",
-            "options": ["Alcohol – Nitrogenase", "Detergents – Lipase", "Textile – Amylase", "Fruit juice – Pectinase"],
+            "options": ["Alcohol - Nitrogenase", "Detergents - Lipase", "Textile - Amylase", "Fruit juice - Pectinase"],
             "correct_answer": "Gene",
             "topic": "Physiology"
         },

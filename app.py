@@ -6,7 +6,7 @@ from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, Length, ValidationError
 from flask_wtf import FlaskForm
 import pandas as pd
-import json,os
+import json,os,traceback
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret'
@@ -66,12 +66,18 @@ def home():
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     form = RegisterForm()
+
+    # Debugging: Check if form is being validated
     if form.validate_on_submit():
+        print("Form is valid")
+        
         email = form.email.data
         existing_user = User.query.filter_by(email=email).first()
+
         if existing_user:
             flash("⚠️ Account already exists! Please log in.", "error")
             return redirect(url_for('signup')) 
+
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')  # Hash password
         
         new_user = User(
@@ -81,13 +87,25 @@ def signup():
             password=hashed_password  # Store the hashed password
         )
 
-        db.session.add(new_user)
-        db.session.commit()
+        try:
+            db.session.add(new_user)
+            db.session.commit()  # Commit to save the user data
+            flash("✅ Account created successfully! Please log in.", "success")
+            return redirect(url_for('login'))
 
-        flash("✅ Account created successfully! Please log in.", "success")
-        return redirect(url_for('login'))
+        except Exception as e:
+            # Debugging: Print exception for clarity
+            print(f"Error: {e}")
+            flash("⚠️ Something went wrong! Please try again.", "error")
+            db.session.rollback()  # Rollback in case of error to maintain integrity
+            return redirect(url_for('signup'))
+
+    else:
+        # Debugging: Print out form errors
+        print(form.errors)
 
     return render_template('signup.html', form=form)
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -136,8 +154,14 @@ with open("data/quiz.json", "r") as file:
 def get_quiz_questions():
     return jsonify(quiz_data["questions"])
 
-QUIZ_FILE = "quiz.json"
-USER_PERFORMANCE_FILE = "user_performance.json"
+DATA_FOLDER = "data"
+QUIZ_FILE = os.path.join(DATA_FOLDER, "quiz.json")
+USER_PERFORMANCE_FILE = os.path.join(DATA_FOLDER, "user_performance.json")
+DATABASE_FILE = "users.db"
+
+if not os.path.exists(USER_PERFORMANCE_FILE) or os.path.getsize(USER_PERFORMANCE_FILE) == 0:
+    with open(USER_PERFORMANCE_FILE, "w") as file:
+        json.dump({}, file)
 
 def load_quiz():
     """Load quiz data from JSON."""
@@ -148,73 +172,116 @@ def load_quiz():
         return {"questions": []}
 
 def load_user_performance():
-    """Load user performance data from JSON."""
+    """Load user performance data from JSON safely."""
     try:
-        with open(USER_PERFORMANCE_FILE, "r") as file:
-            return json.load(file)
-    except (FileNotFoundError, json.JSONDecodeError):
-        return {}
+        if os.path.exists(USER_PERFORMANCE_FILE) and os.path.getsize(USER_PERFORMANCE_FILE) > 0:
+            with open(USER_PERFORMANCE_FILE, "r") as file:
+                return json.load(file)
+    except (json.JSONDecodeError, FileNotFoundError):
+        pass
+    return {} 
+
 
 def save_user_performance(data):
     """Save user performance data to JSON."""
     with open(USER_PERFORMANCE_FILE, "w") as file:
         json.dump(data, file, indent=4)
+        
+def get_user_id():
+    """Retrieve user ID from Flask-Login session."""
+    if current_user.is_authenticated:
+        return current_user.id
+    return None
 
-@app.route('/submit_quiz', methods=['POST'])
-def submit_quiz():
-    user_id = session.get("user_id")  # Get logged-in user ID
+@app.route("/save_quiz", methods=["POST"])
+@login_required
+def save_quiz():
+    """Save user's answers and generate/update user_performance.json"""
+    user_id = get_user_id()
     if not user_id:
-        return jsonify({"error": "User not logged in"}), 403
+        return jsonify({"error": "User not authenticated"}), 401
 
-    quiz_data = load_quiz()["questions"]  # Load quiz questions
-    user_performance = load_user_performance()  # Load stored user answers
+    if not request.is_json:
+        return jsonify({"error": "Invalid request format"}), 400
 
-    # Ensure user exists in user_performance.json; if not, create an entry
+    data = request.get_json()
+    user_answers = data.get("answers", {})  # Default to empty dict if missing
+
+    if not user_answers:
+        return jsonify({"error": "No answers provided"}), 400
+
+    try:
+        print(f"🔹 Received answers: {user_answers}")  # Debugging line
+
+        # Load quiz data
+        with open(QUIZ_FILE, "r") as file:
+            quiz_data = json.load(file)
+
+        # Load or create user performance data
+        if os.path.exists(USER_PERFORMANCE_FILE):
+            with open(USER_PERFORMANCE_FILE, "r") as file:
+                user_performance = json.load(file)
+        else:
+            user_performance = {}
+
+        # Ensure user performance exists for this user
+        if user_id not in user_performance:
+            user_performance[user_id] = []
+
+        # Update answers instead of overwriting them
+        for q in quiz_data["questions"]:
+            question_id = f"q{q['id']}"
+            existing_entry = next((entry for entry in user_performance[user_id] if entry["question_id"] == q["id"]), None)
+
+            if existing_entry:
+                existing_entry["marked_answer"] = user_answers.get(question_id, "Not Answered")
+            else:
+                user_performance[user_id].append({
+                    "question_id": q["id"],
+                    "question": q["question"],
+                    "topic": q["topic"],
+                    "marked_answer": user_answers.get(question_id, "Not Answered"),
+                    "correct_answer": q["correct_answer"]
+                })
+
+        # Save updated performance data
+        with open(USER_PERFORMANCE_FILE, "w") as file:
+            json.dump(user_performance, file, indent=4)
+
+        return jsonify({"message": "Answers saved successfully!", "saved": True})
+
+    except Exception as e:
+        print("🔥 Error occurred while saving quiz answers!")  # Debugging
+        traceback.print_exc()  # Print full error traceback in the terminal
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/submit_quiz", methods=["POST"])
+@login_required
+def submit_quiz():
+    """Calculate quiz score and return results."""
+    user_id = get_user_id()
+    if not user_id:
+        return jsonify({"error": "User not authenticated"}), 401
+
+    if not os.path.exists(USER_PERFORMANCE_FILE):
+        return jsonify({"error": "User performance data not found!"}), 500
+
+    with open(USER_PERFORMANCE_FILE, "r") as file:
+        user_performance = json.load(file)
+
     if user_id not in user_performance:
-        user_performance[user_id] = {"answers": [], "score": 0}
+        return jsonify({"error": "No answers recorded for this user!"}), 500
 
-    user_answers = request.json.get("answers", [])  # Get submitted answers from frontend
-    score = 0
+    score = sum(4 for entry in user_performance[user_id] if entry["marked_answer"] == entry["correct_answer"])
+    total_questions = len(user_performance[user_id])
 
-    # Store user's answers for this attempt
-    for answer in user_answers:
-        question_text = answer["question"]
-        selected_answer = answer["user_answer"]
-        topic = answer["topic"]
+    return jsonify({
+        "message": "Quiz submitted successfully!",
+        "score": f"{score}/{total_questions}",
+        "answers": user_performance[user_id]
+    })
 
-        # Find correct answer from quiz.json
-        correct_answer = next(
-            (q["correct_answer"] for q in quiz_data if q["question"] == question_text), None
-        )
-
-        # Calculate score
-        if correct_answer:
-            if selected_answer == correct_answer:
-                score += 4  # Correct answer: +4 points
-            elif selected_answer != "Not Answered":
-                score -= 1  # Wrong answer: -1 point
-
-        # Append user's answer to their history
-        user_performance[user_id]["answers"].append({
-            "question": question_text,
-            "user_answer": selected_answer,
-            "correct_answer": correct_answer,
-            "topic": topic
-        })
-
-    # Store updated score for the user
-    user_performance[user_id]["score"] = score
-    save_user_performance(user_performance)
-
-    # Determine message based on score
-    if score >= 65:
-        message = "confetti"
-    elif score >= 40:
-        message = "well_done"
-    else:
-        message = "check_answers"
-
-    return jsonify({"score": score, "message": message})
 
 
 @app.route('/submit')

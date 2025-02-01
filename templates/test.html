@@ -8,41 +8,44 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
     <script>
-        let timeLeft = 1800; // 45 minutes in seconds
+        let timeLeft = 1800; // 30 minutes in seconds
         let currentQuestion = 0;
         let questions = [];
-        let userAnswers = {}; // Store selected answers
+        let userAnswers = JSON.parse(localStorage.getItem("userAnswers")) || {}; 
+        let answersSaved = false; // Flag to ensure saving before submission
+        let timerInterval;
 
-        // Update the countdown timer
-        function updateTimer() {
-            let minutes = Math.floor(timeLeft / 60);
-            let seconds = timeLeft % 60;
-            document.getElementById("timer").innerText = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-            if (timeLeft > 0) {
-                timeLeft--;
-                setTimeout(updateTimer, 1000);
-            } else {
-                document.getElementById("test-form").submit();
-            }
-        }
-
-        // Fetch quiz questions from backend
         async function fetchQuestions() {
             try {
                 const response = await fetch('/get_quiz_questions');
                 questions = await response.json();
                 renderQuestion();
+                startTimer();
             } catch (error) {
                 console.error("Error fetching questions:", error);
             }
         }
 
-        // Render a single question based on `currentQuestion`
+        function startTimer() {
+            const timerDisplay = document.getElementById("timer");
+            timerInterval = setInterval(() => {
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    submitQuiz(); // Auto-submit when time is up
+                } else {
+                    let minutes = Math.floor(timeLeft / 60);
+                    let seconds = timeLeft % 60;
+                    timerDisplay.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                    timeLeft--;
+                }
+            }, 1000);
+        }
+
         function renderQuestion() {
             if (questions.length === 0) return;
 
             const questionContainer = document.getElementById("question-container");
-            questionContainer.innerHTML = ""; // Clear previous content
+            questionContainer.innerHTML = "";
 
             let questionData = questions[currentQuestion];
             let questionElement = document.createElement("div");
@@ -52,7 +55,7 @@
                 <h2 class="question-title">Question ${currentQuestion + 1}</h2>
                 <p class="question-text">${questionData.question}</p>
                 <div class="options">
-                    ${questionData.options.map((opt, index) => `
+                    ${questionData.options.map(opt => `
                         <label class="option-label">
                             <input type="radio" name="q${questionData.id}" value="${opt}" 
                                 ${userAnswers[`q${questionData.id}`] === opt ? "checked" : ""} 
@@ -66,22 +69,17 @@
 
             questionContainer.appendChild(questionElement);
 
-            // Hide "Previous" button for the first question
             document.getElementById("prev-btn").style.display = currentQuestion === 0 ? "none" : "inline-block";
-
-            // Show "Submit" button only on last question
-            document.getElementById("submit-btn").style.display = currentQuestion === questions.length - 1 ? "inline-block" : "none";
-
-            // Hide "Next" button on last question
             document.getElementById("next-btn").style.display = currentQuestion === questions.length - 1 ? "none" : "inline-block";
+            document.getElementById("save-btn").style.display = currentQuestion === questions.length - 1 ? "inline-block" : "none";
+            document.getElementById("submit-btn").style.display = "none";
         }
 
-        // Save user's selected answer
         function saveAnswer(questionId, answer) {
             userAnswers[questionId] = answer;
+            localStorage.setItem("userAnswers", JSON.stringify(userAnswers));
         }
 
-        // Navigate to the next question
         function nextQuestion() {
             if (currentQuestion < questions.length - 1) {
                 currentQuestion++;
@@ -89,7 +87,6 @@
             }
         }
 
-        // Navigate to the previous question
         function prevQuestion() {
             if (currentQuestion > 0) {
                 currentQuestion--;
@@ -97,24 +94,48 @@
             }
         }
 
-        // Handle quiz submission
+        function saveQuiz() {
+            fetch('/save_quiz', {
+                method: 'POST',
+                headers: { "Content-Type": "application/json" }, 
+                body: JSON.stringify({ answers: userAnswers })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.saved) {
+                    answersSaved = true;
+                    alert("Answers saved successfully!");
+                    document.getElementById("submit-btn").style.display = "inline-block";
+                }
+            })
+            .catch(error => console.error("Error saving quiz:", error));
+        }
+
         function submitQuiz() {
+            if (!answersSaved) {
+                alert("Please save your answers before submitting.");
+                return;
+            }
+
             fetch('/submit_quiz', {
                 method: 'POST',
-                body: JSON.stringify(userAnswers),
                 headers: { "Content-Type": "application/json" }
             })
             .then(response => response.json())
             .then(data => {
-                alert("Quiz submitted successfully!");
+                alert(`Quiz Submitted!\nScore: ${data.score}`);
+                localStorage.removeItem("userAnswers"); // Clear stored answers after submission
                 window.location.href = "/submit";
             })
             .catch(error => console.error("Error submitting quiz:", error));
         }
 
-        // Initialize the page on load
         window.onload = function() {
-            updateTimer();
             fetchQuestions();
         }
     </script>
@@ -134,6 +155,7 @@
             <div class="quiz-navigation">
                 <button id="prev-btn" onclick="prevQuestion()">⬅ Previous</button>
                 <button id="next-btn" onclick="nextQuestion()">Next ➡</button>
+                <button id="save-btn" onclick="saveQuiz()">Save Answers</button>
                 <button id="submit-btn" onclick="submitQuiz()" style="display: none;">Submit Quiz</button>
             </div>
         </div>
