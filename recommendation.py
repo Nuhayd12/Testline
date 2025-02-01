@@ -62,10 +62,15 @@ quiz_data, performance_data = load_data(quiz_file, performance_file)
 topic_scores, topic_questions = calculate_scores(quiz_data, performance_data)
 recommendations = generate_recommendations(topic_scores, topic_questions)
 
-def generate_pie_chart(user_id, topic_scores, recommendations, chart_dir="charts"):
+def generate_pie_chart(user_id, topic_scores, recommendations, chart_dir="static"):
     # Create directory for charts if it doesn't exist
     if not os.path.exists(chart_dir):
         os.makedirs(chart_dir)
+        
+    safe_user_id = str(user_id).replace('/', '_').replace('\\', '_')
+    
+    chart_file = f"user_{safe_user_id}_analysis.png"
+    chart_path = os.path.join(chart_dir, chart_file) 
 
     # Get user scores
     scores = topic_scores[user_id]
@@ -118,3 +123,28 @@ for user, recs in recommendations.items():
     for rec in recs:
         print(f"  - {rec}")
     print()
+
+def generate_video_recommendations(weak_topics):
+    video_recommendations = []
+
+    # Define your videos mapping based on topics
+    videos = {
+        "Genetics": [
+            {"title": "Introduction to Genetics", "url": "https://www.youtube.com/watch?v=example1", "thumbnail": "https://img.youtube.com/vi/example1/0.jpg"},
+            {"title": "Gene Expression and Regulation", "url": "https://www.youtube.com/watch?v=example2", "thumbnail": "https://img.youtube.com/vi/example2/0.jpg"},
+        ],
+        "Cell Biology": [
+            {"title": "Plant Cell Overview", "url": "https://www.youtube.com/watch?v=example3", "thumbnail": "https://img.youtube.com/vi/example3/0.jpg"},
+            {"title": "Organelles and Functions", "url": "https://www.youtube.com/watch?v=example4", "thumbnail": "https://img.youtube.com/vi/example4/0.jpg"},
+        ],
+        "Physiology": [
+            {"title": "Introduction to Physiology", "url": "https://www.youtube.com/watch?v=example5", "thumbnail": "https://img.youtube.com/vi/example5/0.jpg"},
+        ],
+    }
+
+    # Populate video recommendations based on weak topics
+    for weak_topic in weak_topics:
+        if weak_topic in videos:
+            video_recommendations.extend(videos[weak_topic])
+
+    print(video_recommendations)

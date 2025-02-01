@@ -161,3 +161,11 @@ For support or queries, please contact [Your Contact Information]
 - Real-time progress tracking
 - Peer comparison features
 - Integration with external learning resources
+
+
+## LOGIN CREDENTIALS FOR TESTING THE APPLICATION
+
+- username: test_student
+- phone: 10-digit number random
+- email test_student@gmail.com
+- password - tests123 (Will be hashed!)

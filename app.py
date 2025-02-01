@@ -11,7 +11,7 @@ matplotlib.use('Agg')
 import json,os,traceback
 import matplotlib.pyplot as plt
 from collections import defaultdict
-from recommendation import load_data,calculate_scores,generate_pie_chart,generate_recommendations
+from recommendation import load_data,calculate_scores,generate_pie_chart,generate_recommendations,generate_video_recommendations
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret'
@@ -315,8 +315,7 @@ def generate_analysis(user_id):
     recommendations = generate_recommendations(topic_scores, topic_questions)
 
     # Generate pie chart for visualizing performance
-    chart_dir = f"charts/user_{user_id}_analysis.png"
-    chart_path = generate_pie_chart(user_id, topic_scores, recommendations, chart_dir)
+    chart_path = generate_pie_chart(user_id, topic_scores, recommendations, chart_dir="static/charts/")
 
     # Generate video recommendations
     weak_topics = recommendations.get(user_id, [])
@@ -335,14 +334,16 @@ def generate_analysis(user_id):
                 {"title": "Introduction to Physiology", "url": "https://www.youtube.com/watch?v=example5", "thumbnail": "https://img.youtube.com/vi/example5/0.jpg"}
             ]
         }
+        video_recommendations = generate_video_recommendations(weak_topics)
         # Dynamically fetch videos based on weak topics
         for weak_topic in weak_topics:
             if weak_topic in videos:
                 video_recommendations.extend(videos[weak_topic])
+        
 
     # Return the data as JSON
     return jsonify({
-        "chart_url": f"/{chart_path}",  # Path to the generated pie chart
+        "chart_url": f"{chart_path}",  # Path to the generated pie chart
         "recommendations": recommendations.get(user_id, []),  # List of weak topic recommendations
         "video_recommendations": video_recommendations  # List of video links and thumbnails
     })

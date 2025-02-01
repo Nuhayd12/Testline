@@ -850,5 +850,147 @@
             "marked_answer": "Cell diversity",
             "correct_answer": "Ecosystem diversity"
         }
+    ],
+    "7": [
+        {
+            "question_id": 1,
+            "question": "What is the powerhouse of the cell?",
+            "topic": "Cell Biology",
+            "marked_answer": "Mitochondria",
+            "correct_answer": "Mitochondria"
+        },
+        {
+            "question_id": 2,
+            "question": "Which of the following is NOT a part of the human digestive system?",
+            "topic": "Physiology",
+            "marked_answer": "Heart",
+            "correct_answer": "Heart"
+        },
+        {
+            "question_id": 3,
+            "question": "What is the basic unit of heredity?",
+            "topic": "Genetics",
+            "marked_answer": "Chromosome",
+            "correct_answer": "Gene"
+        },
+        {
+            "question_id": 4,
+            "question": "Trade name of genetically engineered insulin is?",
+            "topic": "Genetics",
+            "marked_answer": "Humilin",
+            "correct_answer": "Humilin"
+        },
+        {
+            "question_id": 5,
+            "question": "What is the consequence of a change in the genetic diversity",
+            "topic": "Genetics",
+            "marked_answer": "leads to an increase in the population",
+            "correct_answer": "results in loss of biological diversity"
+        },
+        {
+            "question_id": 6,
+            "question": "In the rainy season, doors get swelled up due to",
+            "topic": "Physiology",
+            "marked_answer": "Imbibition",
+            "correct_answer": "Imbibition"
+        },
+        {
+            "question_id": 7,
+            "question": "In C3 and C4 plants, primary carboxylation takes place with the help of",
+            "topic": "Physiology",
+            "marked_answer": "RuBP carboxylase and PEP carboxylase",
+            "correct_answer": "RuBP carboxylase and PEP carboxylase"
+        },
+        {
+            "question_id": 8,
+            "question": "A country with several different habitat types is said to have a high degree of",
+            "topic": "Genetics",
+            "marked_answer": "Species diversity",
+            "correct_answer": "Habitat diversity"
+        },
+        {
+            "question_id": 9,
+            "question": "Peroxisomes are involved in which type of reactions pertaining to plant photosynthesis?",
+            "topic": "Physiology",
+            "marked_answer": "Glyoxylate cycle",
+            "correct_answer": "Glyoxylate cycle"
+        },
+        {
+            "question_id": 10,
+            "question": "Macromolecule chitin is",
+            "topic": "Physiology",
+            "marked_answer": "phosphorous containing polysaccharide",
+            "correct_answer": "nitrogen containing polysaccharide"
+        },
+        {
+            "question_id": 11,
+            "question": "Crossing over refers to",
+            "topic": "Genetics",
+            "marked_answer": "change in chromosome",
+            "correct_answer": "exchange of segments between sections of chromosome"
+        },
+        {
+            "question_id": 12,
+            "question": "This is a wrongly matched pair",
+            "topic": "Physiology",
+            "marked_answer": "Alcohol - Nitrogenase",
+            "correct_answer": "Gene"
+        },
+        {
+            "question_id": 13,
+            "question": "This cell is the longest in the human body",
+            "topic": "Cell Biology",
+            "marked_answer": "Nerve cells",
+            "correct_answer": "Nerve cells"
+        },
+        {
+            "question_id": 14,
+            "question": "This structure of the plant cell is non-living",
+            "topic": "Cell Biology",
+            "marked_answer": "cell wall",
+            "correct_answer": "cell wall"
+        },
+        {
+            "question_id": 15,
+            "question": "Increasing genetic diversity interprets daughter chromosome contains genes from",
+            "topic": "Genetics",
+            "marked_answer": "Single parent",
+            "correct_answer": "Both parents"
+        },
+        {
+            "question_id": 16,
+            "question": "A phenomenon occurring during prophase I of meiosis is",
+            "topic": "Genetics",
+            "marked_answer": "Synapsis",
+            "correct_answer": "Synapsis"
+        },
+        {
+            "question_id": 17,
+            "question": "This cell organelle does not contain DNA",
+            "topic": "Cell Biology",
+            "marked_answer": "Lysosomes",
+            "correct_answer": "Lysosomes"
+        },
+        {
+            "question_id": 18,
+            "question": "The main difference between human cheek cells and onion peel cells is",
+            "topic": "Cell Biology",
+            "marked_answer": "Absence of the plasma membrane in cheek cells",
+            "correct_answer": "Presence of cell wall in onion peel cells"
+        },
+        {
+            "question_id": 19,
+            "question": "The most abundant protein in the animal world is",
+            "topic": "Physiology",
+            "marked_answer": "Collagen",
+            "correct_answer": "Collagen"
+        },
+        {
+            "question_id": 20,
+            "question": "This biodiversity boosts the oxygen availability",
+            "topic": "Genetics",
+            "marked_answer": "Ecosystem diversity",
+            "correct_answer": "Ecosystem diversity"
+        }
     ]
 }
